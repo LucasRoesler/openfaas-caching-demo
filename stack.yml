@@ -4,6 +4,6 @@ provider:
   gateway: http://127.0.0.1:8080
 functions:
   telephone:
-    lang: python3-flask
+    lang: python3-flask-debian
     handler: ./telephone
     image: ghcr.io/lucasroesler/telephone:latest
