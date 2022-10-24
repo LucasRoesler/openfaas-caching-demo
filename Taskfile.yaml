@@ -1,0 +1,39 @@
+version: "3"
+
+env:
+  VENV: '{{default ".venv" .VENV}}'
+
+dotenv: [".env"]
+silent: true
+
+vars:
+  PYTHON: "{{.VENV}}/bin/python"
+  VERSION:
+    sh: git describe --tags --always
+  ROOT:
+    sh: git rev-parse --show-toplevel
+
+tasks:
+  virtualenv:
+    summary: Create a Python 3 virtualenv
+    cmds:
+      - "{{ .python }} -m venv {{.VENV}}"
+    status:
+      - test -d {{.VENV}}
+    vars:
+      python:
+        sh: |
+          if [ -x "$(command -v pyenv)" ]; then
+            pyenv which python3 2>/dev/null
+          else
+            which python3
+          fi
+  setup:
+    desc: Initialize the local development environment
+    cmds:
+      - task: virtualenv
+      - "{{.VENV}}/bin/pip install -r telephone/requirements.txt"
+    sources:
+      - telephone/requirements.txt
+    generates:
+      - .venv/*
