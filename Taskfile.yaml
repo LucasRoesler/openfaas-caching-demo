@@ -18,6 +18,7 @@ tasks:
     summary: Create a Python 3 virtualenv
     cmds:
       - "{{ .python }} -m venv {{.VENV}}"
+      - "{{ .python }} -m pip install --upgrade pip"
     status:
       - test -d {{.VENV}}
     vars:

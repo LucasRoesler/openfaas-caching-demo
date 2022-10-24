@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build with Cache
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Release Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install arkade
+        uses: alexellis/setup-arkade@v2
+
+      - name: Install faas-cli
+        run: arkade get faas-cli
+
+      - name: shrinkwrap
+        run: faas-cli build --shrinkwrap
+
+      - name: build with docker
+        uses: docker/build-push-action@v3
+        with:
+          context: "./build/telephone"
+          push: true
+          tags: ghcr.io/lucasroesler/telephone:latest
+          cache-from: type=registry,ref=ghcr.io/lucasroesler/telephone:latest
+          cache-to: type=inline
+
+  build-again:
+    runs-on: ubuntu-latest
+    name: Build without Cache
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Release Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install arkade
+        uses: alexellis/setup-arkade@v2
+
+      - name: Install faas-cli
+        run: arkade get faas-cli
+
+      - name: build
+        run: faas-cli build

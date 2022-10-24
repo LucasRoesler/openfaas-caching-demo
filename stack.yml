@@ -3,8 +3,7 @@ provider:
   name: openfaas
   gateway: http://127.0.0.1:8080
 functions:
-  telelphone:
+  telephone:
     lang: python3-flask
-    handler: ./telelphone
-    image: telelphone:latest
-
+    handler: ./telephone
+    image: ghcr.io/lucasroesler/telephone:latest
